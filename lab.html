@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Details - Lab Connect</title>
+    <title>Lab Details - UEM-LAB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -197,7 +197,7 @@
                 </div>
                 <div>
                     <div class="lab-hero-name" id="labHeroName">Loading...</div>
-                    <div class="lab-hero-sub" id="labHeroSub">Computer Lab &bull; Lab Connect</div>
+                    <div class="lab-hero-sub" id="labHeroSub">Computer Lab &bull; UEM-LAB</div>
                 </div>
             </div>
             <div class="stats-strip">
@@ -534,8 +534,8 @@
         const titleSpan = document.querySelector('#labTitle span');
         if(titleSpan && titleSpan.textContent && titleSpan.textContent !== 'Loading...') {
           document.getElementById('labHeroName').textContent = titleSpan.textContent;
-          document.getElementById('labHeroSub').textContent = titleSpan.textContent + ' · Lab Connect';
-          document.title = titleSpan.textContent + ' - Lab Connect';
+          document.getElementById('labHeroSub').textContent = titleSpan.textContent + ' · UEM-LAB';
+          document.title = titleSpan.textContent + ' - UEM-LAB';
         }
       });
       const labTitleEl = document.getElementById('labTitle');
@@ -559,6 +559,7 @@
     </script>
 </body>
 </html>
+
 
 
 
