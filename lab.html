@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Details - Lab Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+      :root {
+        --bg: #0f1117; --card: #1a1d27; --border: #2a2d3a;
+        --text: #e2e8f0; --muted: #64748b;
+        --accent: #6366f1; --success: #10b981; --danger: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      body { margin:0; font-family:'Inter',ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh;
+        background-image: radial-gradient(ellipse at 10% 0%,rgba(99,102,241,0.08) 0%,transparent 50%),
+                          radial-gradient(ellipse at 90% 80%,rgba(139,92,246,0.06) 0%,transparent 50%);
+      }
+      header { position:sticky;top:0;z-index:30;background:rgba(26,29,39,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem; }
+      .logo-mark { display:flex;align-items:center;justify-content:center;width:34px;height:34px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;flex-shrink:0; }
+      .btn { display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.9rem;border-radius:8px;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;white-space:nowrap; }
+      .btn-ghost { background:transparent;color:var(--muted);border:1px solid var(--border); }
+      .btn-ghost:hover { background:rgba(255,255,255,0.05);color:var(--text); }
+      .btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.25); }
+      .btn-primary:hover { opacity:0.9;transform:translateY(-1px); }
+      main { max-width:1100px;margin:0 auto;padding:2rem 1.5rem; }
+      .page-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem; }
+      .masonry-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem; }
+      @media(max-width:640px){ .masonry-grid{grid-template-columns:1fr;} }
+      .computer-card { background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.2s; }
+      .computer-card:hover { border-color:rgba(99,102,241,0.4);box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+      .computer-card.expanded { border-color:rgba(99,102,241,0.5); }
+      .card-header { display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer; }
+      .comp-num { display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2));border:1px solid rgba(99,102,241,0.3);border-radius:9px;font-weight:700;font-size:0.9rem;color:#818cf8;flex-shrink:0; }
+      .comp-info { flex:1;margin-left:0.75rem; }
+      .comp-name { font-weight:600;font-size:0.9rem; }
+      .comp-detail { font-size:0.75rem;color:var(--muted);margin-top:0.15rem; }
+      .status-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+      .status-working { background:#10b981;box-shadow:0 0 6px rgba(16,185,129,0.5); }
+      .status-not-working { background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,0.5); }
+      .badge { display:inline-flex;align-items:center;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:500; }
+      .badge-green { background:rgba(16,185,129,0.15);color:#34d399; }
+      .badge-red { background:rgba(239,68,68,0.15);color:#f87171; }
+      .expandable-content { max-height:0;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1); }
+      .card-body { padding:0 1.25rem 1.25rem;border-top:1px solid var(--border); }
+      .card-body-inner { padding-top:1rem; }
+      .info-row { display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.82rem; }
+      .info-row:last-child { border-bottom:none; }
+      .info-label { color:var(--muted); }
+      .card-actions { display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap; }
+      .card-actions .btn { font-size:0.75rem;padding:0.35rem 0.7rem; }
+      .btn-feedback { background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(5,150,105,0.15));color:#34d399;border:1px solid rgba(16,185,129,0.3); }
+      .btn-feedback:hover { background:linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.25)); }
+      /* Lab hero banner */
+      .lab-hero {
+        background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08));
+        border: 1px solid rgba(99,102,241,0.2);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .lab-hero-left { display:flex;align-items:center;gap:1rem; }
+      .lab-hero-icon {
+        width:52px;height:52px;
+        background:linear-gradient(135deg,#6366f1,#8b5cf6);
+        border-radius:12px;
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 8px 20px rgba(99,102,241,0.35);
+        flex-shrink:0;
+      }
+      .lab-hero-name { font-size:1.4rem;font-weight:700;margin:0 0 0.2rem; }
+      .lab-hero-sub { font-size:0.8rem;color:var(--muted); }
+      .stats-strip { display:flex;gap:1rem;flex-wrap:wrap; }
+      .stat-pill {
+        background:rgba(255,255,255,0.04);
+        border:1px solid var(--border);
+        border-radius:10px;
+        padding:0.6rem 1rem;
+        text-align:center;
+        min-width:80px;
+      }
+      .stat-pill-val { font-size:1.3rem;font-weight:700; }
+      .stat-pill-val.green { color:#10b981; }
+      .stat-pill-val.red { color:#ef4444; }
+      .stat-pill-val.blue { color:#818cf8; }
+      .stat-pill-label { font-size:0.68rem;color:var(--muted);margin-top:0.1rem; }
+      /* Modal */
+      .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;padding:1rem; }
+      .modal-overlay.show, .modal-overlay.open { display:flex; }
+      .modal { background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.75rem;width:100%;max-width:440px;box-shadow:0 25px 50px rgba(0,0,0,0.5); }
+      .modal h3 { font-size:1.1rem;font-weight:600;margin:0 0 0.25rem; }
+      .modal p { color:var(--muted);font-size:0.85rem;margin:0 0 1.25rem; }
+      .form-group { margin-bottom:1rem; }
+      .form-group label { display:block;font-size:0.8rem;color:#94a3b8;margin-bottom:0.4rem; }
+      .form-input { width:100%;background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.875rem;color:var(--text);font-size:0.875rem;outline:none;transition:border-color 0.2s; }
+      .form-input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
+      .modal-footer { display:flex;justify-content:flex-end;gap:0.5rem;margin-top:1.25rem; }
+      .input-rel { position:relative; }
+      .input-rel .form-input { padding-right:2.5rem; }
+      .eye-btn { position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:0;display:flex;align-items:center; }
+      .eye-btn:hover { color:var(--text); }
+      .dropdown-wrap { position:relative; }
+      .dropdown-btn { width:100%;background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.875rem;color:var(--text);font-size:0.875rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer; }
+      .dropdown-options { display:none;position:absolute;z-index:50;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);overflow:hidden; }
+      .dropdown-options.open { display:block; }
+      .dropdown-option { padding:0.6rem 0.875rem;font-size:0.875rem;cursor:pointer;transition:background 0.15s; }
+      .dropdown-option:hover { background:rgba(255,255,255,0.05); }
+      #sidebarOverlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:40; }
+      #sidebar { position:fixed;inset-y:0;left:0;width:260px;background:var(--card);border-right:1px solid var(--border);z-index:50;transform:translateX(-100%);transition:transform 0.3s;display:flex;flex-direction:column; }
+      #sidebar.open { transform:translateX(0); }
+      #confirmModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:60;align-items:center;justify-content:center;padding:1rem; }
+      #confirmModal.show, #confirmModal.open { display:flex; }
+      #reviewsModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;padding:1rem; }
+      #reviewsModal.show, #reviewsModal.open { display:flex; }
+      #qrDetailsModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;padding:1rem; }
+      #qrDetailsModal.show, #qrDetailsModal.open { display:flex; }
+      #feedbackModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;padding:1rem; }
+      #feedbackModal.show { display:flex; }
+      #labQRModal { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;padding:1rem; }
+      #labQRModal.show { display:flex; }
+      .hidden { display:none!important; }
+      @keyframes spin{to{transform:rotate(360deg);}}
+    </style>
+</head>
+<body>
+    <header>
+        <button id="mobileMenuBtn" style="display:none;background:none;border:none;cursor:pointer;color:var(--muted);padding:0.25rem;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+        <div class="logo-mark">
+            <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <a href="./dashboard.html" class="btn btn-ghost" style="display:none;" id="backBtn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            Dashboard
+        </a>
+        <h1 id="labTitle" style="font-size:0.95rem;font-weight:600;margin:0;display:flex;align-items:center;gap:0.5rem;overflow:hidden;">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Loading...</span>
+        </h1>
+        <div style="margin-left:auto;display:flex;gap:0.5rem;" id="headerActions">
+            <button id="feedbackBtn" class="btn btn-feedback">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Feedback
+            </button>
+            <button id="labQRBtn" class="btn btn-ghost">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                Lab QR
+            </button>
+            <button id="openAddComputerModal" class="btn btn-primary">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Computer
+            </button>
+            <button id="bulkDownloadBtn" class="btn btn-ghost">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Bulk QR
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Sidebar -->
+    <div id="sidebarOverlay"></div>
+    <aside id="sidebar">
+        <div style="padding:1.25rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <span id="sidebarLabName" style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Lab Details</span>
+            <button id="closeSidebar" style="background:none;border:none;cursor:pointer;color:var(--muted);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div style="padding:1rem;display:flex;flex-direction:column;gap:0.25rem;">
+            <a href="./dashboard.html" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.875rem;font-weight:500;color:var(--muted);text-decoration:none;transition:all 0.2s;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Go to Dashboard
+            </a>
+            <button id="sidebarAddComp" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.875rem;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;width:100%;transition:all 0.2s;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Add Computer
+            </button>
+            <button id="sidebarBulkQR" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.875rem;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;width:100%;transition:all 0.2s;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download Bulk QRs
+            </button>
+        </div>
+    </aside>
+
+    <main>
+        <!-- Lab Hero Banner -->
+        <div class="lab-hero">
+            <div class="lab-hero-left">
+                <div class="lab-hero-icon">
+                    <svg width="26" height="26" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div>
+                    <div class="lab-hero-name" id="labHeroName">Loading...</div>
+                    <div class="lab-hero-sub" id="labHeroSub">Computer Lab &bull; Lab Connect</div>
+                </div>
+            </div>
+            <div class="stats-strip">
+                <div class="stat-pill">
+                    <div class="stat-pill-val blue" id="statTotal">—</div>
+                    <div class="stat-pill-label">Total</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-pill-val green" id="statWorking">—</div>
+                    <div class="stat-pill-label">Working</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-pill-val red" id="statBroken">—</div>
+                    <div class="stat-pill-label">Issues</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+            <div style="font-size:0.95rem;font-weight:600;display:flex;align-items:center;gap:0.5rem;color:var(--muted);">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                All Computers
+            </div>
+        </div>
+        <div id="computersList" class="masonry-grid"></div>
+    </main>
+
+    <!-- Add Computer Modal -->
+    <div id="computerModal" class="modal-overlay">
+        <div class="modal">
+            <h3>Add New Computer</h3>
+            <p>Enter the details of the computer to add it to the lab.</p>
+            <form id="addComputerForm">
+                <div class="form-group">
+                    <label>Computer Number</label>
+                    <input type="number" id="computerNumber" placeholder="e.g. 101" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>System Details</label>
+                    <input type="text" id="computerDetails" placeholder="e.g. i5, 8GB RAM" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Computer Password</label>
+                    <div class="input-rel">
+                        <input type="password" id="computerPassword" placeholder="e.g. password123" required class="form-input">
+                        <button type="button" id="toggleCompPassword" class="eye-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Initial Status</label>
+                    <div class="dropdown-wrap" id="computerStatusDropdown">
+                        <button type="button" class="dropdown-btn">
+                            <span class="selected-value">Working</span>
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option" data-value="Working">Working</div>
+                            <div class="dropdown-option" data-value="Not Working">Not Working</div>
+                        </div>
+                        <input type="hidden" id="computerStatus" value="Working">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeComputerModal" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Computer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Computer Modal -->
+    <div id="editComputerModal" class="modal-overlay">
+        <div class="modal">
+            <h3>Edit Computer</h3>
+            <p>Update details for this system.</p>
+            <form id="editComputerForm">
+                <input type="hidden" id="editCompId">
+                <div class="form-group">
+                    <label>Computer Number</label>
+                    <input type="number" id="editCompNumber" placeholder="e.g. 101" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>System Details</label>
+                    <input type="text" id="editCompDetails" placeholder="e.g. i5, 8GB RAM" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Computer Password</label>
+                    <div class="input-rel">
+                        <input type="password" id="editCompPassword" placeholder="e.g. password123" required class="form-input">
+                        <button type="button" id="toggleEditCompPassword" class="eye-btn">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="dropdown-wrap" id="editCompStatusDropdown">
+                        <button type="button" class="dropdown-btn">
+                            <span class="selected-value">Working</span>
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="dropdown-options">
+                            <div class="dropdown-option" data-value="Working">Working</div>
+                            <div class="dropdown-option" data-value="Not Working">Not Working</div>
+                        </div>
+                        <input type="hidden" id="editCompStatus" value="Working">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeEditComputerModal" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirmModal">
+        <div class="modal">
+            <h3 id="confirmTitle">Are you sure?</h3>
+            <p id="confirmMessage">This action cannot be undone.</p>
+            <div class="modal-footer">
+                <button id="confirmCancel" class="btn btn-ghost">Cancel</button>
+                <button id="confirmProceed" class="btn" style="background:#ef4444;color:#fff;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Modal -->
+    <div id="reviewsModal">
+        <div class="modal" style="max-width:520px;max-height:80vh;display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                <h3 style="margin:0;">Computer Reviews</h3>
+                <button id="closeReviewsModal" style="background:none;border:none;cursor:pointer;color:var(--muted);">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="modalReviewsList" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0.75rem;padding-right:0.25rem;"></div>
+        </div>
+    </div>
+
+    <!-- QR Details Modal -->
+    <div id="qrDetailsModal">
+        <div class="modal">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                <h3 style="margin:0;">Computer QR Code</h3>
+                <button id="closeQRModal" style="background:none;border:none;cursor:pointer;color:var(--muted);">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="qrModalContent" style="display:flex;flex-direction:column;gap:1rem;"></div>
+            <div style="margin-top:1rem;">
+                <button id="downloadQRFromModal" class="btn btn-primary" style="width:100%;justify-content:center;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download QR Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab QR Modal -->
+    <div id="labQRModal">
+        <div class="modal" style="max-width:380px;text-align:center;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;text-align:left;">
+                <div>
+                    <h3 style="margin:0 0 0.2rem;">Lab QR Code</h3>
+                    <p style="margin:0;font-size:0.8rem;color:var(--muted);">Scan to open this lab's page</p>
+                </div>
+                <button id="closeLabQRModal" style="background:none;border:none;cursor:pointer;color:var(--muted);">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="labQRCode" style="display:inline-block;background:#fff;padding:1rem;border-radius:12px;margin-bottom:1rem;"></div>
+            <div id="labQRName" style="font-weight:600;font-size:0.95rem;margin-bottom:0.25rem;"></div>
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:1rem;" id="labQRUrl"></div>
+            <button id="downloadLabQR" class="btn btn-primary" style="width:100%;justify-content:center;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download Lab QR
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal">
+        <div class="modal" style="max-width:460px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+                <div>
+                    <h3 style="margin:0 0 0.2rem;">Lab Feedback</h3>
+                    <p style="margin:0;font-size:0.8rem;color:var(--muted);">Share your experience about this lab</p>
+                </div>
+                <button id="closeFeedbackModal" style="background:none;border:none;cursor:pointer;color:var(--muted);">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form id="feedbackForm">
+                <div class="form-group">
+                    <label>Overall Rating</label>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.25rem;" id="starRating">
+                        <span class="star" data-val="1" style="font-size:1.6rem;cursor:pointer;color:#2a2d3a;transition:color 0.15s;">★</span>
+                        <span class="star" data-val="2" style="font-size:1.6rem;cursor:pointer;color:#2a2d3a;transition:color 0.15s;">★</span>
+                        <span class="star" data-val="3" style="font-size:1.6rem;cursor:pointer;color:#2a2d3a;transition:color 0.15s;">★</span>
+                        <span class="star" data-val="4" style="font-size:1.6rem;cursor:pointer;color:#2a2d3a;transition:color 0.15s;">★</span>
+                        <span class="star" data-val="5" style="font-size:1.6rem;cursor:pointer;color:#2a2d3a;transition:color 0.15s;">★</span>
+                    </div>
+                    <input type="hidden" id="feedbackRating" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select class="form-input" id="feedbackCategory">
+                        <option value="general">General</option>
+                        <option value="hardware">Hardware Issue</option>
+                        <option value="cleanliness">Cleanliness</option>
+                        <option value="network">Network / Internet</option>
+                        <option value="suggestion">Suggestion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Feedback</label>
+                    <textarea id="feedbackText" rows="4" placeholder="Write your feedback here..." class="form-input" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeFeedbackModal2" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+    <script type="module" src="./js/lab.js"></script>
+    <script>
+      const mobileBtn = document.getElementById('mobileMenuBtn');      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const closeSidebar = document.getElementById('closeSidebar');
+      const backBtn = document.getElementById('backBtn');
+      function openSidebar() { sidebar.classList.add('open'); overlay.style.display='block'; }
+      function closeSidebarFn() { sidebar.classList.remove('open'); overlay.style.display='none'; }
+      if(mobileBtn) mobileBtn.addEventListener('click', openSidebar);
+      if(closeSidebar) closeSidebar.addEventListener('click', closeSidebarFn);
+      if(overlay) overlay.addEventListener('click', closeSidebarFn);
+      function checkMobile() {
+        const isMobile = window.innerWidth < 640;
+        if(mobileBtn) mobileBtn.style.display = isMobile ? 'block' : 'none';
+        if(backBtn) backBtn.style.display = isMobile ? 'none' : 'inline-flex';
+        const headerActions = document.getElementById('headerActions');
+        if(headerActions) headerActions.style.display = isMobile ? 'none' : 'flex';
+      }
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      // Dropdown logic handled by lab.js
+    </script>
+
+      // Lab QR Modal
+      const labQRModal = document.getElementById('labQRModal');
+      document.getElementById('labQRBtn')?.addEventListener('click', () => {
+        labQRModal.classList.remove('hidden');
+        labQRModal.style.display = 'flex';
+        // Generate QR for this lab page
+        const qrDiv = document.getElementById('labQRCode');
+        qrDiv.innerHTML = '';
+        const labUrl = window.location.href;
+        document.getElementById('labQRUrl').textContent = labUrl.length > 50 ? labUrl.substring(0,50)+'...' : labUrl;
+        const heroName = document.getElementById('labHeroName').textContent;
+        document.getElementById('labQRName').textContent = heroName !== 'Loading...' ? heroName : 'This Lab';
+        if(typeof QRCode !== 'undefined') {
+          new QRCode(qrDiv, { text: labUrl, width: 200, height: 200 });
+        }
+      });
+      document.getElementById('closeLabQRModal')?.addEventListener('click', () => {
+        labQRModal.classList.add('hidden'); labQRModal.style.display='none';
+      });
+      labQRModal.addEventListener('click', e => { if(e.target===labQRModal){ labQRModal.classList.add('hidden'); labQRModal.style.display='none'; }});
+      document.getElementById('downloadLabQR')?.addEventListener('click', () => {
+        const canvas = document.getElementById('labQRCode').querySelector('canvas');
+        if(canvas) {
+          const a = document.createElement('a');
+          a.download = 'Lab_QR.png';
+          a.href = canvas.toDataURL();
+          a.click();
+        }
+      });
+
+      // Feedback modal
+      const feedbackModal = document.getElementById('feedbackModal');
+      document.getElementById('feedbackBtn')?.addEventListener('click', () => {
+        feedbackModal.classList.remove('hidden');
+        feedbackModal.style.display = 'flex';
+      });
+      function closeFeedback() {
+        feedbackModal.classList.add('hidden');
+        feedbackModal.style.display = 'none';
+      }
+      document.getElementById('closeFeedbackModal')?.addEventListener('click', closeFeedback);
+      document.getElementById('closeFeedbackModal2')?.addEventListener('click', closeFeedback);
+      feedbackModal.addEventListener('click', e => { if(e.target === feedbackModal) closeFeedback(); });
+
+      // Star rating
+      const stars = document.querySelectorAll('.star');
+      let selectedRating = 0;
+      stars.forEach(star => {
+        star.addEventListener('mouseover', () => {
+          const val = +star.dataset.val;
+          stars.forEach(s => s.style.color = +s.dataset.val <= val ? '#f59e0b' : '#2a2d3a');
+        });
+        star.addEventListener('mouseout', () => {
+          stars.forEach(s => s.style.color = +s.dataset.val <= selectedRating ? '#f59e0b' : '#2a2d3a');
+        });
+        star.addEventListener('click', () => {
+          selectedRating = +star.dataset.val;
+          document.getElementById('feedbackRating').value = selectedRating;
+          stars.forEach(s => s.style.color = +s.dataset.val <= selectedRating ? '#f59e0b' : '#2a2d3a');
+        });
+      });
+
+      // Feedback form submit (frontend only)
+      document.getElementById('feedbackForm')?.addEventListener('submit', e => {
+        e.preventDefault();
+        closeFeedback();
+        document.getElementById('feedbackForm').reset();
+        selectedRating = 0;
+        stars.forEach(s => s.style.color = '#2a2d3a');
+        // Show toast
+        const toast = document.createElement('div');
+        toast.style.cssText = 'background:#1a1d27;border:1px solid #10b981;color:#34d399;padding:0.75rem 1rem;border-radius:10px;font-size:0.85rem;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);';
+        toast.textContent = '✓ Feedback submitted successfully';
+        document.getElementById('toastContainer').appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      });
+
+      // Update lab hero name from labTitle
+      const observer = new MutationObserver(() => {
+        const titleSpan = document.querySelector('#labTitle span');
+        if(titleSpan && titleSpan.textContent && titleSpan.textContent !== 'Loading...') {
+          document.getElementById('labHeroName').textContent = titleSpan.textContent;
+          document.getElementById('labHeroSub').textContent = titleSpan.textContent + ' · Lab Connect';
+          document.title = titleSpan.textContent + ' - Lab Connect';
+        }
+      });
+      const labTitleEl = document.getElementById('labTitle');
+      if(labTitleEl) observer.observe(labTitleEl, { childList: true, subtree: true, characterData: true });
+
+      // Update stats when computers load
+      const compListObserver = new MutationObserver(() => {
+        const cards = document.querySelectorAll('.computer-card');
+        const total = cards.length;
+        let working = 0, broken = 0;
+        cards.forEach(card => {
+          const dot = card.querySelector('.status-working');
+          if(dot) working++; else broken++;
+        });
+        document.getElementById('statTotal').textContent = total || '0';
+        document.getElementById('statWorking').textContent = working || '0';
+        document.getElementById('statBroken').textContent = broken || '0';
+      });
+      const compList = document.getElementById('computersList');
+      if(compList) compListObserver.observe(compList, { childList: true, subtree: true });
+    </script>
+</body>
+</html>
+
+
+

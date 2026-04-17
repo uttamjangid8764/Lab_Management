@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Lab Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root{--text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;--border:rgba(255,255,255,.1);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    /* === WALLPAPER BACKGROUND === */
+    body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;color:var(--text);min-height:100vh;
+      background: #0a0e1a;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(99,102,241,.55) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(139,92,246,.45) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(6,182,212,.15) 0%, transparent 60%);
+    }
+    /* Animated mesh */
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:
+        linear-gradient(rgba(99,102,241,.06) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(99,102,241,.06) 1px,transparent 1px);
+      background-size:60px 60px;
+    }
+    /* Floating orbs */
+    .orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;animation:orbFloat 12s ease-in-out infinite;}
+    .orb1{width:600px;height:600px;background:rgba(99,102,241,.2);top:-200px;left:-150px;animation-delay:0s;}
+    .orb2{width:500px;height:500px;background:rgba(139,92,246,.18);bottom:-150px;right:-100px;animation-delay:-5s;}
+    .orb3{width:350px;height:350px;background:rgba(6,182,212,.12);top:40%;left:60%;animation-delay:-9s;}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1);}40%{transform:translate(30px,-30px) scale(1.04);}70%{transform:translate(-20px,20px) scale(.97);}}
+
+    /* === LIQUID GLASS === */
+    .glass{
+      background:rgba(255,255,255,.07);
+      backdrop-filter:blur(20px) saturate(180%);
+      -webkit-backdrop-filter:blur(20px) saturate(180%);
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow:0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .glass-dark{
+      background:rgba(10,14,26,.55);
+      backdrop-filter:blur(24px) saturate(160%);
+      -webkit-backdrop-filter:blur(24px) saturate(160%);
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    /* Header */
+    header{position:sticky;top:0;z-index:30;height:60px;display:flex;align-items:center;padding:0 1.5rem;gap:.75rem;
+      background:rgba(10,14,26,.6);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.1);
+      box-shadow:0 1px 0 rgba(255,255,255,.05);}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(99,102,241,.4);}
+    .brand{font-weight:800;font-size:.95rem;background:linear-gradient(135deg,#e2e8f0,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .hdr-right{margin-left:auto;display:flex;align-items:center;gap:.4rem;}
+
+    /* === LIQUID GLASS BUTTONS === */
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:10px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;text-decoration:none;position:relative;overflow:hidden;}
+    .btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none;border-radius:inherit;}
+
+    .btn-glass{
+      background:rgba(255,255,255,.08);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.15);
+      color:rgba(255,255,255,.8);
+      box-shadow:0 4px 15px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .btn-glass:hover{background:rgba(255,255,255,.14);color:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.3);}
+
+    .btn-primary{
+      background:linear-gradient(135deg,rgba(99,102,241,.9),rgba(139,92,246,.9));
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(139,92,246,.4);
+      color:#fff;
+      box-shadow:0 4px 20px rgba(99,102,241,.4), inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 25px rgba(99,102,241,.5);}
+
+    .btn-danger{
+      background:rgba(239,68,68,.15);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(239,68,68,.3);
+      color:#fca5a5;
+      box-shadow:0 4px 15px rgba(239,68,68,.15), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .btn-danger:hover{background:rgba(239,68,68,.25);color:#fff;}
+
+    .btn-success{
+      background:rgba(16,185,129,.12);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(16,185,129,.3);
+      color:#6ee7b7;
+      box-shadow:0 4px 15px rgba(16,185,129,.12), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .btn-success:hover{background:rgba(16,185,129,.22);color:#fff;}
+
+    /* Main */
+    main{max-width:1200px;margin:0 auto;padding:1.75rem 1.5rem;position:relative;z-index:1;}
+    .page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.75rem;gap:1rem;flex-wrap:wrap;}
+    .page-title{font-size:1.7rem;font-weight:800;background:linear-gradient(135deg,#fff,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .page-sub{color:var(--muted);font-size:.8rem;margin-top:.25rem;}
+
+    /* Lab section */
+    .lab-section{border-radius:16px;margin-bottom:1.25rem;overflow:hidden;
+      background:rgba(255,255,255,.05);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.1);}
+    .lab-section-hdr{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);}
+    .lab-section-name{font-size:1.05rem;font-weight:700;}
+    .lab-badge{background:rgba(99,102,241,.25);color:#a5b4fc;padding:.18rem .55rem;border-radius:5px;font-size:.68rem;font-weight:700;border:1px solid rgba(99,102,241,.3);}
+    .lab-count-badge{background:rgba(255,255,255,.08);color:var(--muted);padding:.18rem .55rem;border-radius:5px;font-size:.68rem;font-weight:600;border:1px solid rgba(255,255,255,.1);}
+    .lab-section-actions{margin-left:auto;display:flex;gap:.4rem;}
+
+    /* Computers grid */
+    .computers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.75rem;padding:1rem 1.25rem;}
+    .comp-mini{
+      background:rgba(255,255,255,.06);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:10px;padding:.875rem;position:relative;transition:all .2s;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.1);}
+    .comp-mini:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.1);box-shadow:0 4px 20px rgba(99,102,241,.2),inset 0 1px 0 rgba(255,255,255,.15);}
+    .comp-mini-id{font-size:.82rem;font-weight:700;margin-bottom:.3rem;}
+    .comp-mini-status{font-size:.7rem;color:var(--muted);margin-bottom:.15rem;}
+    .comp-mini-student{font-size:.68rem;color:var(--muted);}
+    .comp-status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:.3rem;vertical-align:middle;}
+    .dot-green{background:#10b981;box-shadow:0 0 6px rgba(16,185,129,.6);}
+    .dot-red{background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.6);}
+    .comp-mini-actions{position:absolute;top:.45rem;right:.45rem;display:none;gap:.25rem;}
+    .comp-mini:hover .comp-mini-actions{display:flex;}
+    .comp-action-btn{width:22px;height:22px;border-radius:5px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+    .comp-action-del{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+    .comp-action-qr{background:rgba(99,102,241,.2);color:#a5b4fc;border:1px solid rgba(99,102,241,.3);}
+    .add-comp-card{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:10px;padding:.875rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;cursor:pointer;transition:all .2s;min-height:88px;}
+    .add-comp-card:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.06);}
+    .add-comp-icon{width:28px;height:28px;border-radius:50%;background:rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;color:#a5b4fc;}
+    .add-comp-label{font-size:.72rem;color:var(--muted);}
+
+    /* Modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:50;align-items:center;justify-content:center;padding:1rem;}
+    .modal-bg.show{display:flex;}
+    .modal{
+      background:rgba(15,20,35,.85);
+      backdrop-filter:blur(30px) saturate(180%);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:18px;padding:1.75rem;width:100%;max-width:440px;
+      box-shadow:0 30px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1);}
+    .modal-title{font-size:1.05rem;font-weight:700;margin-bottom:.2rem;}
+    .modal-sub{color:var(--muted);font-size:.8rem;margin-bottom:1.2rem;}
+    .form-group{margin-bottom:.9rem;}
+    .form-group label{display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:.3rem;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:.58rem .85rem;color:var(--text);font-size:.85rem;outline:none;transition:all .2s;backdrop-filter:blur(8px);}
+    .form-input:focus{border-color:rgba(99,102,241,.6);box-shadow:0 0 0 3px rgba(99,102,241,.15);background:rgba(255,255,255,.09);}
+    .modal-footer{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1.2rem;}
+    .inp-rel{position:relative;}
+    .inp-rel .form-input{padding-right:2.5rem;}
+    .eye-btn{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:0;display:flex;align-items:center;}
+
+    #confirmModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:60;align-items:center;justify-content:center;padding:1rem;}
+    #confirmModal.show{display:flex;}
+    #labQRModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:50;align-items:center;justify-content:center;padding:1rem;}
+    #labQRModal.show{display:flex;}
+
+    #toastContainer{position:fixed;bottom:1rem;right:1rem;z-index:100;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
+    .toast{background:rgba(15,20,35,.9);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.7rem 1rem;border-radius:10px;font-size:.8rem;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:.5rem;}
+    .toast.ok{border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+    .toast.err{border-color:rgba(239,68,68,.4);color:#fca5a5;}
+
+    .empty-labs{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5rem 2rem;color:var(--muted);gap:.75rem;text-align:center;border:2px dashed rgba(255,255,255,.1);border-radius:16px;background:rgba(255,255,255,.02);}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+  <header>
+    <div class="logo-mark">
+      <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+    </div>
+    <span class="brand">Lab Connect</span>
+    <div class="hdr-right">
+      <button id="changePassBtn" class="btn btn-glass"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>Password</button>
+      <button id="createAdminBtn" class="btn btn-glass"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Admins <span id="adminCount" style="background:rgba(99,102,241,.3);color:#a5b4fc;padding:.08rem .35rem;border-radius:4px;font-size:.65rem;font-weight:700;margin-left:.15rem;">0</span></button>
+      <button id="logoutBtn" class="btn btn-glass"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-hdr">
+      <div><div class="page-title">Lab Overview</div><div class="page-sub">Monitor hardware status and student assignments.</div></div>
+      <div style="display:flex;gap:.5rem;">
+        <button id="addLabBtn" class="btn btn-primary"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>+ Add Lab</button>
+        <button id="refreshBtn" class="btn btn-glass"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+      </div>
+    </div>
+    <div id="labsList"></div>
+  </main>
+
+  <!-- Create Lab Modal - with Lab Number -->
+  <div id="createLabModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Create New Lab</div><div class="modal-sub">Enter details for the new computer lab.</div>
+      <form id="createLabForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="form-group" style="margin:0;">
+            <label>Lab Name</label>
+            <input type="text" id="labName" placeholder="e.g. Engineering Lab" required class="form-input"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Lab Number / ID</label>
+            <input type="text" id="labNumber" placeholder="e.g. LAB-A1" required class="form-input"/>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:.9rem;">
+          <label>Description <span style="color:var(--muted);font-weight:400;">(Optional)</span></label>
+          <input type="text" id="labDesc" placeholder="e.g. Ground floor, Block B" class="form-input"/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="closeLabModal" class="btn btn-glass">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Lab</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Lab Modal -->
+  <div id="editLabModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Edit Lab</div><div class="modal-sub">Update the lab details.</div>
+      <form id="editLabForm">
+        <input type="hidden" id="editLabId"/>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="form-group" style="margin:0;">
+            <label>Lab Name</label>
+            <input type="text" id="editLabName" placeholder="e.g. Engineering Lab" required class="form-input"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Lab Number / ID</label>
+            <input type="text" id="editLabNumber" placeholder="e.g. LAB-A1" class="form-input"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="closeEditLabModal" class="btn btn-glass">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Create New Admin</div><div class="modal-sub">Add a new administrator account.</div>
+      <form id="createAdminForm">
+        <div class="form-group"><label>Email</label><input type="email" id="newAdminEmail" required placeholder="admin@example.com" class="form-input"/></div>
+        <div class="form-group"><label>Password</label>
+          <div class="inp-rel"><input type="password" id="newAdminPassword" required placeholder="Min 6 characters" class="form-input"/>
+            <button type="button" class="eye-btn" onclick="toggleVis('newAdminPassword')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+          </div>
+        </div>
+        <div class="modal-footer"><button type="button" id="closeAdminModal" class="btn btn-glass">Cancel</button><button type="submit" class="btn btn-primary">Create Admin</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div id="changePassModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Change Password</div><div class="modal-sub">Update your admin account password.</div>
+      <form id="changePassForm">
+        <div class="form-group"><label>Current Password</label>
+          <div class="inp-rel"><input type="password" id="currentPass" required placeholder="••••••••" class="form-input"/>
+            <button type="button" class="eye-btn" onclick="toggleVis('currentPass')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+          </div>
+        </div>
+        <div class="form-group"><label>New Password</label>
+          <div class="inp-rel"><input type="password" id="newPass" required placeholder="Min 6 characters" class="form-input"/>
+            <button type="button" class="eye-btn" onclick="toggleVis('newPass')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+          </div>
+        </div>
+        <div class="form-group"><label>Confirm New Password</label>
+          <div class="inp-rel"><input type="password" id="confirmPass" required placeholder="Repeat new password" class="form-input"/>
+            <button type="button" class="eye-btn" onclick="toggleVis('confirmPass')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+          </div>
+        </div>
+        <div id="passErr" style="display:none;color:#fca5a5;font-size:.76rem;padding:.45rem .7rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:7px;margin-bottom:.75rem;"></div>
+        <div class="modal-footer"><button type="button" id="closeChangePassModal" class="btn btn-glass">Cancel</button><button type="submit" id="changePassSubmit" class="btn btn-primary">Update Password</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lab QR Modal -->
+  <div id="labQRModal">
+    <div class="modal" style="max-width:340px;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;text-align:left;">
+        <div><div class="modal-title" style="margin:0 0 .15rem;">Lab QR Code</div><div class="modal-sub" style="margin:0;">Scan to open this lab</div></div>
+        <button id="closeLabQRModal" style="background:none;border:none;cursor:pointer;color:var(--muted);"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div id="labQRCode" style="display:inline-block;background:#fff;padding:.875rem;border-radius:10px;margin-bottom:.75rem;"></div>
+      <div id="labQRName" style="font-weight:700;font-size:.9rem;margin-bottom:.15rem;"></div>
+      <div id="labQRLink" style="font-size:.68rem;color:var(--muted);margin-bottom:.9rem;word-break:break-all;padding:0 .5rem;"></div>
+      <button id="downloadLabQR" class="btn btn-primary" style="width:100%;justify-content:center;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Download QR</button>
+    </div>
+  </div>
+
+  <!-- Add Computer Modal (Dashboard) -->
+  <div id="addCompModal" class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Add Computer</div>
+      <div class="modal-sub">Add a new computer to this lab.</div>
+      <form id="addCompForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="form-group" style="margin:0;">
+            <label>Computer Number</label>
+            <input type="number" id="addCompNumber" placeholder="e.g. 1" required class="form-input" min="1"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Status</label>
+            <select id="addCompStatus" class="form-input">
+              <option value="Working">Working</option>
+              <option value="Not Working">Not Working</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:.9rem;">
+          <label>System Details</label>
+          <input type="text" id="addCompDetails" placeholder="e.g. i5, 8GB RAM, 256GB SSD" required class="form-input"/>
+        </div>
+        <div class="form-group">
+          <label>Computer Password</label>
+          <div class="inp-rel">
+            <input type="password" id="addCompPassword" placeholder="e.g. lab@123" required class="form-input"/>
+            <button type="button" class="eye-btn" onclick="toggleVis('addCompPassword')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="addCompErr" style="display:none;color:#fca5a5;font-size:.76rem;padding:.45rem .7rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:7px;margin-bottom:.75rem;"></div>
+        <div class="modal-footer">
+          <button type="button" id="closeAddCompModal" class="btn btn-glass">Cancel</button>
+          <button type="submit" id="addCompSubmit" class="btn btn-primary">Add Computer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal">
+    <div class="modal" style="max-width:360px;">
+      <div class="modal-title" id="confirmTitle">Are you sure?</div>
+      <div class="modal-sub" id="confirmMsg" style="margin-bottom:1.5rem;">This action cannot be undone.</div>
+      <div class="modal-footer"><button id="confirmCancel" class="btn btn-glass">Cancel</button><button id="confirmOk" class="btn btn-danger">Delete</button></div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+  <script type="module" src="./js/dashboard.js"></script>
+  <script type="module">
+    import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import firebaseConfig from './js/firebase-config.js';
+    const app = getApps()[0];
+    const db = getFirestore(app);
+
+    document.getElementById('addCompForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const labId = window._addCompLabId;
+      if(!labId) return;
+      const errEl = document.getElementById('addCompErr');
+      errEl.style.display = 'none';
+      const btn = document.getElementById('addCompSubmit');
+      btn.disabled = true; btn.textContent = 'Adding...';
+      try {
+        await addDoc(collection(db,'computers'), {
+          labId: labId,
+          number: parseInt(document.getElementById('addCompNumber').value),
+          details: document.getElementById('addCompDetails').value,
+          password: document.getElementById('addCompPassword').value,
+          status: document.getElementById('addCompStatus').value,
+          createdAt: new Date().toISOString()
+        });
+        document.getElementById('addCompModal').classList.remove('show');
+        document.getElementById('addCompForm').reset();
+        // Show toast
+        const t = document.createElement('div');
+        t.className = 'toast ok'; t.textContent = '✓ Computer added successfully';
+        document.getElementById('toastContainer').appendChild(t);
+        setTimeout(()=>t.remove(), 3000);
+        // Reload labs
+        setTimeout(()=>location.reload(), 800);
+      } catch(err) {
+        errEl.textContent = err.message; errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Add Computer';
+      }
+    });
+  </script>
+  <script type="module">
+    import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    const auth = getAuth();
+    const modal = document.getElementById('changePassModal');
+    const errEl = document.getElementById('passErr');
+    function showM(){modal.classList.add('show');}
+    function hideM(){modal.classList.remove('show');errEl.style.display='none';document.getElementById('changePassForm').reset();}
+    document.getElementById('changePassBtn').addEventListener('click',showM);
+    document.getElementById('closeChangePassModal').addEventListener('click',hideM);
+    modal.addEventListener('click',e=>{if(e.target===modal)hideM();});
+    document.getElementById('changePassForm').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const cur=document.getElementById('currentPass').value,np=document.getElementById('newPass').value,cp=document.getElementById('confirmPass').value;
+      errEl.style.display='none';
+      if(np.length<6){errEl.textContent='Min 6 characters required.';errEl.style.display='block';return;}
+      if(np!==cp){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
+      const btn=document.getElementById('changePassSubmit');btn.disabled=true;btn.textContent='Updating...';
+      try{
+        const user=auth.currentUser;
+        await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,cur));
+        await updatePassword(user,np);hideM();
+        const t=document.createElement('div');t.className='toast ok';t.textContent='✓ Password updated';
+        document.getElementById('toastContainer').appendChild(t);setTimeout(()=>t.remove(),3000);
+      }catch(err){
+        errEl.textContent=err.code==='auth/wrong-password'||err.code==='auth/invalid-credential'?'Current password is incorrect.':'Update failed.';
+        errEl.style.display='block';
+      }finally{btn.disabled=false;btn.textContent='Update Password';}
+    });
+  </script>
+  <script>
+    function toggleVis(id){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
+    window.openLabQR=function(labId,labName){
+      const modal=document.getElementById('labQRModal');modal.classList.add('show');
+      const url=`${window.location.origin}/lab-feedback.html?labId=${labId}`;
+      document.getElementById('labQRName').textContent=labName;
+      document.getElementById('labQRLink').textContent=url;
+      const qrDiv=document.getElementById('labQRCode');qrDiv.innerHTML='';
+      new QRCode(qrDiv,{text:url,width:170,height:170});
+    };
+    document.getElementById('closeLabQRModal').addEventListener('click',()=>document.getElementById('labQRModal').classList.remove('show'));
+    document.getElementById('labQRModal').addEventListener('click',e=>{if(e.target===document.getElementById('labQRModal'))document.getElementById('labQRModal').classList.remove('show');});
+    document.getElementById('downloadLabQR').addEventListener('click',()=>{
+      const c=document.getElementById('labQRCode').querySelector('canvas');
+      if(c){const a=document.createElement('a');a.download='Lab_QR.png';a.href=c.toDataURL();a.click();}
+    });
+    document.getElementById('refreshBtn').addEventListener('click',()=>location.reload());
+
+    // Add Computer Modal
+    document.getElementById('closeAddCompModal').addEventListener('click',()=>document.getElementById('addCompModal').classList.remove('show'));
+    document.getElementById('addCompModal').addEventListener('click',e=>{if(e.target===document.getElementById('addCompModal'))document.getElementById('addCompModal').classList.remove('show');});
+  </script>
+</body>
+</html>

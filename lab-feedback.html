@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab Feedback - Lab Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;color:var(--text);min-height:100vh;
+      background:#0a0e1a;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% -10%,rgba(99,102,241,.5) 0%,transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%,rgba(139,92,246,.4) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%,rgba(6,182,212,.12) 0%,transparent 60%);
+      padding:1.5rem 1rem 3rem;
+    }
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(99,102,241,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.05) 1px,transparent 1px);
+      background-size:55px 55px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;animation:orbFloat 10s ease-in-out infinite;}
+    .o1{width:500px;height:500px;background:rgba(99,102,241,.18);top:-150px;left:-100px;}
+    .o2{width:400px;height:400px;background:rgba(139,92,246,.15);bottom:-100px;right:-80px;animation-delay:-5s;}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-20px);}}
+
+    .container{max-width:520px;margin:0 auto;position:relative;z-index:1;}
+
+    /* Top nav */
+    .top-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .nav-logo{display:flex;align-items:center;gap:.5rem;}
+    .logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(99,102,241,.4);}
+    .brand{font-weight:800;font-size:.9rem;background:linear-gradient(135deg,#e2e8f0,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .nav-badge{font-size:.7rem;color:#a5b4fc;background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.3);padding:.2rem .6rem;border-radius:999px;}
+
+    /* Glass card */
+    .card{background:rgba(255,255,255,.06);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.12);border-radius:18px;overflow:hidden;margin-bottom:1rem;box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);}
+    .card-hdr{padding:1.1rem 1.4rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:.75rem;}
+    .card-icon{width:40px;height:40px;background:linear-gradient(135deg,rgba(99,102,241,.3),rgba(139,92,246,.3));border:1px solid rgba(99,102,241,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .card-title{font-size:.95rem;font-weight:700;}
+    .card-sub{font-size:.72rem;color:var(--muted);margin-top:.1rem;}
+    .card-body{padding:1.1rem 1.4rem;}
+
+    /* Lab info */
+    .lab-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.75rem;}
+    .lab-info-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.65rem .85rem;}
+    .lab-info-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem;}
+    .lab-info-val{font-size:.88rem;font-weight:600;}
+
+    /* PC Issues checkboxes */
+    .issues-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;}
+    .issue-chip{display:flex;align-items:center;gap:.5rem;padding:.55rem .75rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:9px;cursor:pointer;transition:all .18s;user-select:none;}
+    .issue-chip:hover{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);}
+    .issue-chip.selected{background:rgba(99,102,241,.18);border-color:rgba(99,102,241,.5);color:#a5b4fc;}
+    .issue-chip input{display:none;}
+    .issue-icon{font-size:1rem;flex-shrink:0;}
+    .issue-label{font-size:.75rem;font-weight:500;}
+
+    /* PC number input */
+    .pc-row{display:flex;gap:.6rem;margin-bottom:.75rem;}
+    .pc-row input, .pc-row select{flex:1;}
+
+    /* Form */
+    .form-group{margin-bottom:.85rem;}
+    .form-group label{display:block;font-size:.75rem;font-weight:600;color:#94a3b8;margin-bottom:.3rem;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:.6rem .875rem;color:var(--text);font-size:.85rem;outline:none;transition:all .2s;backdrop-filter:blur(8px);}
+    .form-input:focus{border-color:rgba(99,102,241,.6);box-shadow:0 0 0 3px rgba(99,102,241,.15);background:rgba(255,255,255,.09);}
+    textarea.form-input{resize:vertical;min-height:90px;}
+    select.form-input{cursor:pointer;}
+    select.form-input option{background:#1a1d27;color:var(--text);}
+
+    /* Rating stars */
+    .stars{display:flex;gap:.35rem;margin-bottom:.75rem;}
+    .star{font-size:1.6rem;cursor:pointer;color:rgba(255,255,255,.2);transition:color .15s;}
+    .star.active{color:#f59e0b;}
+
+    /* Submit btn */
+    .btn-submit{width:100%;background:linear-gradient(135deg,rgba(99,102,241,.9),rgba(139,92,246,.9));backdrop-filter:blur(12px);border:1px solid rgba(139,92,246,.4);color:#fff;border-radius:10px;padding:.75rem;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(99,102,241,.4),inset 0 1px 0 rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .btn-submit:hover{opacity:.9;transform:translateY(-1px);}
+    .btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+    /* Success screen */
+    #successScreen{display:none;text-align:center;padding:3rem 1rem;}
+    .success-icon{width:72px;height:72px;background:linear-gradient(135deg,rgba(16,185,129,.3),rgba(5,150,105,.3));border:2px solid rgba(16,185,129,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;box-shadow:0 0 30px rgba(16,185,129,.3);}
+
+    /* Toast */
+    #toastContainer{position:fixed;bottom:1rem;right:1rem;z-index:100;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
+    .toast{background:rgba(15,20,35,.9);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);color:var(--text);padding:.7rem 1rem;border-radius:10px;font-size:.8rem;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);display:flex;align-items:center;gap:.5rem;}
+    .toast.ok{border-color:rgba(16,185,129,.4);color:#6ee7b7;}
+    .toast.err{border-color:rgba(239,68,68,.4);color:#fca5a5;}
+  </style>
+</head>
+<body>
+  <div class="orb o1"></div><div class="orb o2"></div>
+
+  <div class="container">
+    <!-- Nav -->
+    <div class="top-nav">
+      <div class="nav-logo">
+        <div class="logo-mark"><svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+        <span class="brand">Lab Connect</span>
+      </div>
+      <span class="nav-badge">Student Feedback</span>
+    </div>
+
+    <!-- Lab Info Card -->
+    <div class="card" id="labInfoCard">
+      <div class="card-hdr">
+        <div class="card-icon"><svg width="20" height="20" fill="none" stroke="#a5b4fc" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+        <div>
+          <div class="card-title" id="labInfoName">Loading lab...</div>
+          <div class="card-sub" id="labInfoSub">Lab Connect</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="lab-info-grid">
+          <div class="lab-info-item"><div class="lab-info-label">Lab ID</div><div class="lab-info-val" id="labInfoNumber">—</div></div>
+          <div class="lab-info-item"><div class="lab-info-label">Location</div><div class="lab-info-val" id="labInfoDesc">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback Form -->
+    <div class="card" id="feedbackCard">
+      <div class="card-hdr">
+        <div class="card-icon"><svg width="20" height="20" fill="none" stroke="#a5b4fc" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></div>
+        <div class="card-title">Submit Feedback</div>
+      </div>
+      <div class="card-body">
+        <form id="feedbackForm">
+
+          <!-- PC Number + Overall Status -->
+          <div class="pc-row">
+            <div class="form-group" style="margin:0;flex:1;">
+              <label>PC Number</label>
+              <input type="number" id="pcNumber" placeholder="e.g. 5" min="1" class="form-input"/>
+            </div>
+            <div class="form-group" style="margin:0;flex:1;">
+              <label>Overall Status</label>
+              <select id="overallStatus" required class="form-input">
+                <option value="">Select...</option>
+                <option value="Working Fine">✅ Working Fine</option>
+                <option value="Minor Issues">⚠️ Minor Issues</option>
+                <option value="Not Working">❌ Not Working</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PC Issues checkboxes -->
+          <div class="form-group">
+            <label>Issues Found <span style="color:var(--muted);font-weight:400;">(Select all that apply)</span></label>
+            <div class="issues-grid" id="issuesGrid">
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Mouse not working"/>
+                <span class="issue-icon">🖱️</span><span class="issue-label">Mouse</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Keyboard not working"/>
+                <span class="issue-icon">⌨️</span><span class="issue-label">Keyboard</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Monitor issue"/>
+                <span class="issue-icon">🖥️</span><span class="issue-label">Monitor</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="CPU / System slow"/>
+                <span class="issue-icon">💻</span><span class="issue-label">CPU / Slow</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Internet not working"/>
+                <span class="issue-icon">🌐</span><span class="issue-label">Internet</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Chair / Desk issue"/>
+                <span class="issue-icon">🪑</span><span class="issue-label">Chair/Desk</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Power / Charging issue"/>
+                <span class="issue-icon">🔌</span><span class="issue-label">Power</span>
+              </label>
+              <label class="issue-chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="Software issue"/>
+                <span class="issue-icon">⚙️</span><span class="issue-label">Software</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="form-group">
+            <label>Lab Experience Rating</label>
+            <div class="stars" id="starRow">
+              <span class="star" data-v="1">★</span>
+              <span class="star" data-v="2">★</span>
+              <span class="star" data-v="3">★</span>
+              <span class="star" data-v="4">★</span>
+              <span class="star" data-v="5">★</span>
+            </div>
+            <input type="hidden" id="ratingVal" value="0"/>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label>Description <span style="color:var(--muted);font-weight:400;">(Optional)</span></label>
+            <textarea id="feedbackDesc" rows="3" placeholder="Describe the issue in detail... e.g. 'My mouse click is broken', 'PC takes too long to start'" class="form-input"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            Submit Feedback
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="card">
+      <div class="card-body" style="padding:3rem 1.4rem;text-align:center;">
+        <div class="success-icon">
+          <svg width="32" height="32" fill="none" stroke="#10b981" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div style="font-size:1.2rem;font-weight:800;margin-bottom:.5rem;background:linear-gradient(135deg,#6ee7b7,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Feedback Submitted!</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Thank you for helping us improve the lab experience.</div>
+        <button onclick="resetForm()" style="background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;padding:.6rem 1.5rem;border-radius:9px;cursor:pointer;font-size:.85rem;font-weight:600;">Submit Another</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getFirestore, doc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import firebaseConfig from './js/firebase-config.js';
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const labId = params.get('labId');
+
+    // Load lab info
+    if(labId) {
+      getDoc(doc(db,'labs',labId)).then(snap => {
+        if(snap.exists()) {
+          const d = snap.data();
+          document.getElementById('labInfoName').textContent = d.name;
+          document.getElementById('labInfoSub').textContent = d.description || 'Lab Connect';
+          document.getElementById('labInfoNumber').textContent = d.number || '—';
+          document.getElementById('labInfoDesc').textContent = d.description || '—';
+          document.title = d.name + ' - Feedback';
+        }
+      });
+    }
+
+    // Submit feedback
+    document.getElementById('feedbackForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Submitting...';
+
+      const issues = [...document.querySelectorAll('#issuesGrid input:checked')].map(i => i.value);
+      const rating = parseInt(document.getElementById('ratingVal').value) || 0;
+
+      try {
+        await addDoc(collection(db,'lab_feedback'), {
+          labId: labId || 'unknown',
+          pcNumber: document.getElementById('pcNumber').value || null,
+          overallStatus: document.getElementById('overallStatus').value,
+          issues: issues,
+          rating: rating,
+          description: document.getElementById('feedbackDesc').value,
+          timestamp: new Date().toISOString()
+        });
+        document.getElementById('feedbackCard').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+      } catch(err) {
+        showToast('Failed to submit. Try again.', 'err');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Submit Feedback';
+      }
+    });
+
+    window.resetForm = () => {
+      document.getElementById('feedbackForm').reset();
+      document.querySelectorAll('.issue-chip').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+      document.getElementById('ratingVal').value = '0';
+      document.getElementById('feedbackCard').style.display = 'block';
+      document.getElementById('successScreen').style.display = 'none';
+    };
+
+    function showToast(msg, type='ok') {
+      const t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.textContent = (type==='ok'?'✓ ':'✕ ') + msg;
+      document.getElementById('toastContainer').appendChild(t);
+      setTimeout(()=>t.remove(), 3000);
+    }
+  </script>
+
+  <script>
+    // Chip toggle
+    function toggleChip(el) {
+      el.classList.toggle('selected');
+      el.querySelector('input').checked = el.classList.contains('selected');
+    }
+    // Star rating
+    const stars = document.querySelectorAll('.star');
+    let rating = 0;
+    stars.forEach(s => {
+      s.addEventListener('click', () => {
+        rating = parseInt(s.dataset.v);
+        document.getElementById('ratingVal').value = rating;
+        stars.forEach(st => st.classList.toggle('active', parseInt(st.dataset.v) <= rating));
+      });
+      s.addEventListener('mouseover', () => stars.forEach(st => st.classList.toggle('active', parseInt(st.dataset.v) <= parseInt(s.dataset.v))));
+      s.addEventListener('mouseout', () => stars.forEach(st => st.classList.toggle('active', parseInt(st.dataset.v) <= rating)));
+    });
+  </script>
+</body>
+</html>
